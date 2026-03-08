@@ -70,7 +70,7 @@ A Retrieval-Augmented Generation (RAG) chatbot that lets you upload PDFs and ask
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/rag-chatbot.git
+git clone https://github.com/arshdeep27singh/rag-chatbot.git
 cd rag-chatbot
 
 # Create virtual environment
