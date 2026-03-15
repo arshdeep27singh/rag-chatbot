@@ -310,7 +310,7 @@ elif st.session_state["page"] == "chat":
         with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
             if "sources" in message and message["sources"]:
-                with st.expander("View Sources"):
+                with st.popover("View Sources"):
                     for src in message["sources"]:
                         st.markdown(
                             f'<div class="source-card"><strong>Page {src["page"]}</strong> '
@@ -340,7 +340,7 @@ elif st.session_state["page"] == "chat":
                 st.markdown(result["answer"])
 
                 if result["sources"]:
-                    with st.expander("View Sources"):
+                    with st.popover("View Sources"):
                         for src in result["sources"]:
                             st.markdown(
                                 f'<div class="source-card"><strong>Page {src["page"]}</strong> '
