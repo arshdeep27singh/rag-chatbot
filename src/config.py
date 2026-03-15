@@ -16,9 +16,8 @@ def _get_config(key: str, default: str = "") -> str:
         return default
 
 
-OPENAI_API_KEY = _get_config("OPENAI_API_KEY")
 GROQ_API_KEY = _get_config("GROQ_API_KEY")
-LLM_PROVIDER = _get_config("LLM_PROVIDER", "openai").lower()  # "openai", "groq", or "ollama"
+LLM_PROVIDER = _get_config("LLM_PROVIDER", "groq").lower()  # "groq" or "ollama"
 OLLAMA_MODEL = _get_config("OLLAMA_MODEL", "llama3")
 GROQ_MODEL = _get_config("GROQ_MODEL", "llama-3.3-70b-versatile")
 CHUNK_SIZE = int(_get_config("CHUNK_SIZE", "500"))

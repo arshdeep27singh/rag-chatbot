@@ -1,10 +1,9 @@
-from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from langchain_chroma import Chroma
 
-from config import LLM_PROVIDER, OPENAI_API_KEY, GROQ_API_KEY, OLLAMA_MODEL, GROQ_MODEL
+from config import LLM_PROVIDER, GROQ_API_KEY, OLLAMA_MODEL, GROQ_MODEL
 
 
 SYSTEM_TEMPLATE = """Use the following pieces of context to answer the question. Base your answer only on the context provided.
@@ -24,17 +23,11 @@ def get_llm():
     if LLM_PROVIDER == "ollama":
         from langchain_ollama import OllamaLLM
         return OllamaLLM(model=OLLAMA_MODEL)
-    if LLM_PROVIDER == "groq":
-        from langchain_groq import ChatGroq
-        return ChatGroq(
-            model=GROQ_MODEL,
-            temperature=0.2,
-            api_key=GROQ_API_KEY,
-        )
-    return ChatOpenAI(
-        model="gpt-4o",
+    from langchain_groq import ChatGroq
+    return ChatGroq(
+        model=GROQ_MODEL,
         temperature=0.2,
-        api_key=OPENAI_API_KEY,
+        api_key=GROQ_API_KEY,
     )
 
 

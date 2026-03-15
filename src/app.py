@@ -207,9 +207,8 @@ if st.session_state["page"] == "home":
     _badges = {
         "ollama": ("mode-local", "🏠 Running Locally with Ollama"),
         "groq": ("mode-cloud", "⚡ Running with Groq (Free)"),
-        "openai": ("mode-cloud", "☁️ Running with OpenAI"),
     }
-    _cls, _label = _badges.get(LLM_PROVIDER, _badges["openai"])
+    _cls, _label = _badges.get(LLM_PROVIDER, _badges["groq"])
     st.markdown(f'<div style="text-align:center"><span class="mode-badge {_cls}">{_label}</span></div>', unsafe_allow_html=True)
 
     # Upload zone
