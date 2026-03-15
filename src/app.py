@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from ingest import ingest_documents, get_vectorstore
 from chain import create_rag_chain, ask_question
-from config import UPLOAD_DIR, USE_LOCAL_MODEL
+from config import UPLOAD_DIR, LLM_PROVIDER
 
 # --- Page Config ---
 st.set_page_config(
@@ -204,10 +204,13 @@ if st.session_state["page"] == "home":
     """, unsafe_allow_html=True)
 
     # Mode badge
-    if USE_LOCAL_MODEL:
-        st.markdown('<div style="text-align:center"><span class="mode-badge mode-local">🏠 Running Locally with Ollama</span></div>', unsafe_allow_html=True)
-    else:
-        st.markdown('<div style="text-align:center"><span class="mode-badge mode-cloud">☁️ Running with OpenAI</span></div>', unsafe_allow_html=True)
+    _badges = {
+        "ollama": ("mode-local", "🏠 Running Locally with Ollama"),
+        "groq": ("mode-cloud", "⚡ Running with Groq (Free)"),
+        "openai": ("mode-cloud", "☁️ Running with OpenAI"),
+    }
+    _cls, _label = _badges.get(LLM_PROVIDER, _badges["openai"])
+    st.markdown(f'<div style="text-align:center"><span class="mode-badge {_cls}">{_label}</span></div>', unsafe_allow_html=True)
 
     # Upload zone
     st.markdown("""

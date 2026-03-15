@@ -4,12 +4,12 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
-from config import CHUNK_SIZE, CHUNK_OVERLAP, CHROMA_PERSIST_DIR, USE_LOCAL_MODEL, OPENAI_API_KEY
+from config import CHUNK_SIZE, CHUNK_OVERLAP, CHROMA_PERSIST_DIR, LLM_PROVIDER, OPENAI_API_KEY
 
 
 def get_embeddings():
     """Return embedding model based on configuration."""
-    if USE_LOCAL_MODEL:
+    if LLM_PROVIDER == "ollama":
         from langchain_community.embeddings import HuggingFaceEmbeddings
         return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     return OpenAIEmbeddings(api_key=OPENAI_API_KEY)
