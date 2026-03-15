@@ -7,7 +7,7 @@ import streamlit as st
 # Add src to path so imports work when running from project root
 sys.path.insert(0, os.path.dirname(__file__))
 
-from ingest import ingest_documents, get_vectorstore
+from ingest import ingest_documents
 from chain import create_rag_chain, ask_question
 from config import UPLOAD_DIR, LLM_PROVIDER
 
@@ -183,11 +183,7 @@ def go_to_home():
 
 
 # --- Load existing vectorstore on startup ---
-if "vectorstore" not in st.session_state:
-    existing_store = get_vectorstore()
-    if existing_store:
-        st.session_state["vectorstore"] = existing_store
-        st.session_state["chain"] = create_rag_chain(existing_store)
+# Each session starts fresh — no shared data between users
 
 
 # ============================================================

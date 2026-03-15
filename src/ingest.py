@@ -3,7 +3,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 
-from config import CHUNK_SIZE, CHUNK_OVERLAP, CHROMA_PERSIST_DIR
+from config import CHUNK_SIZE, CHUNK_OVERLAP
 
 
 def get_embeddings():
@@ -27,25 +27,12 @@ def load_and_split_pdf(file_path: str) -> list:
 
 
 def ingest_documents(file_path: str) -> Chroma:
-    """Ingest a PDF into the vector store and return the store."""
+    """Ingest a PDF into an in-memory vector store and return it."""
     chunks = load_and_split_pdf(file_path)
     embeddings = get_embeddings()
 
     vectorstore = Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
-        persist_directory=CHROMA_PERSIST_DIR,
     )
     return vectorstore
-
-
-def get_vectorstore() -> Chroma | None:
-    """Load existing vector store if it exists."""
-    if not os.path.exists(CHROMA_PERSIST_DIR):
-        return None
-
-    embeddings = get_embeddings()
-    return Chroma(
-        persist_directory=CHROMA_PERSIST_DIR,
-        embedding_function=embeddings,
-    )
