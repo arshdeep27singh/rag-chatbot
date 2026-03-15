@@ -269,9 +269,9 @@ if st.session_state["page"] == "home":
             <p>Every answer includes page references so you can verify</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">💾</div>
-            <h3>Persistent Memory</h3>
-            <p>Documents stay indexed — no need to re-upload on restart</p>
+            <div class="feature-icon">�</div>
+            <h3>Private Sessions</h3>
+            <p>Each session is isolated — your documents are never shared with others</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon">🏠</div>
