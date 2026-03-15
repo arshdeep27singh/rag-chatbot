@@ -1,39 +1,29 @@
 from langchain_openai import ChatOpenAI
-from langchain_community.llms import Ollama
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from langchain.prompts import PromptTemplate
+from langchain_ollama import OllamaLLM
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 from langchain_chroma import Chroma
 
 from config import USE_LOCAL_MODEL, OPENAI_API_KEY, OLLAMA_MODEL
 
 
-SYSTEM_TEMPLATE = """You are a helpful assistant that answers questions based on the provided documents.
-Use the following context to answer the question. If the answer is not in the context,
-say "I don't have enough information in the uploaded documents to answer this question."
-
-Always cite which part of the document your answer comes from.
+SYSTEM_TEMPLATE = """Use the following pieces of context to answer the question. Base your answer only on the context provided.
 
 Context:
 {context}
 
-Chat History:
-{chat_history}
-
 Question: {question}
 
-Answer:"""
+Helpful Answer:"""
 
-PROMPT = PromptTemplate(
-    input_variables=["context", "chat_history", "question"],
-    template=SYSTEM_TEMPLATE,
-)
+PROMPT = ChatPromptTemplate.from_template(SYSTEM_TEMPLATE)
 
 
 def get_llm():
     """Return LLM based on configuration."""
     if USE_LOCAL_MODEL:
-        return Ollama(model=OLLAMA_MODEL)
+        return OllamaLLM(model=OLLAMA_MODEL)
     return ChatOpenAI(
         model="gpt-4o",
         temperature=0.2,
@@ -41,36 +31,34 @@ def get_llm():
     )
 
 
-def create_rag_chain(vectorstore: Chroma) -> ConversationalRetrievalChain:
-    """Create a conversational RAG chain."""
+def _format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+def create_rag_chain(vectorstore: Chroma):
+    """Create a RAG chain using LCEL."""
     llm = get_llm()
     retriever = vectorstore.as_retriever(
         search_type="similarity",
         search_kwargs={"k": 4},
     )
 
-    memory = ConversationBufferMemory(
-        memory_key="chat_history",
-        return_messages=True,
-        output_key="answer",
+    chain = (
+        {"context": retriever | _format_docs, "question": RunnablePassthrough()}
+        | PROMPT
+        | llm
+        | StrOutputParser()
     )
-
-    chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriever,
-        memory=memory,
-        combine_docs_chain_kwargs={"prompt": PROMPT},
-        return_source_documents=True,
-    )
-    return chain
+    return {"chain": chain, "retriever": retriever}
 
 
-def ask_question(chain: ConversationalRetrievalChain, question: str) -> dict:
+def ask_question(rag, question: str) -> dict:
     """Ask a question and return the answer with sources."""
-    result = chain.invoke({"question": question})
+    source_docs = rag["retriever"].invoke(question)
+    answer = rag["chain"].invoke(question)
 
     sources = []
-    for doc in result.get("source_documents", []):
+    for doc in source_docs:
         source_info = {
             "page": doc.metadata.get("page", "N/A"),
             "source": doc.metadata.get("source", "Unknown"),
@@ -79,6 +67,6 @@ def ask_question(chain: ConversationalRetrievalChain, question: str) -> dict:
         sources.append(source_info)
 
     return {
-        "answer": result["answer"],
+        "answer": answer,
         "sources": sources,
     }
