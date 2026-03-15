@@ -1,5 +1,4 @@
 from langchain_openai import ChatOpenAI
-from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -23,6 +22,7 @@ PROMPT = ChatPromptTemplate.from_template(SYSTEM_TEMPLATE)
 def get_llm():
     """Return LLM based on configuration."""
     if USE_LOCAL_MODEL:
+        from langchain_ollama import OllamaLLM
         return OllamaLLM(model=OLLAMA_MODEL)
     return ChatOpenAI(
         model="gpt-4o",
