@@ -209,6 +209,44 @@ if st.session_state["page"] == "home":
     else:
         st.markdown('<div style="text-align:center"><span class="mode-badge mode-cloud">☁️ Running with OpenAI</span></div>', unsafe_allow_html=True)
 
+    # Upload zone
+    st.markdown("""
+    <div class="upload-zone">
+        <h3>📁 Get Started</h3>
+        <p>Upload a PDF below to start chatting with your document</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        uploaded_file = st.file_uploader(
+            "Upload a PDF",
+            type=["pdf"],
+            label_visibility="collapsed",
+        )
+
+        if uploaded_file is not None:
+            os.makedirs(UPLOAD_DIR, exist_ok=True)
+            file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+
+            with st.spinner("🔄 Processing your document... Splitting, embedding, and indexing."):
+                vectorstore = ingest_documents(file_path)
+                st.session_state["vectorstore"] = vectorstore
+                st.session_state["chain"] = create_rag_chain(vectorstore)
+
+            st.success(f"✅ **{uploaded_file.name}** processed successfully!")
+            st.button("💬 Start Chatting →", on_click=go_to_chat, type="primary", use_container_width=True)
+
+        elif "chain" in st.session_state:
+            st.info("📚 You have a previously loaded document ready.")
+            st.button("💬 Continue Chatting →", on_click=go_to_chat, type="primary", use_container_width=True)
+
+    # Divider
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+
     # Feature cards
     st.markdown("""
     <div class="feature-grid">
@@ -244,44 +282,6 @@ if st.session_state["page"] == "home":
         </div>
     </div>
     """, unsafe_allow_html=True)
-
-    # Divider
-    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
-
-    # Upload zone
-    st.markdown("""
-    <div class="upload-zone">
-        <h3>📁 Get Started</h3>
-        <p>Upload a PDF below to start chatting with your document</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        uploaded_file = st.file_uploader(
-            "Upload a PDF",
-            type=["pdf"],
-            label_visibility="collapsed",
-        )
-
-        if uploaded_file is not None:
-            os.makedirs(UPLOAD_DIR, exist_ok=True)
-            file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
-
-            with open(file_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-
-            with st.spinner("🔄 Processing your document... Splitting, embedding, and indexing."):
-                vectorstore = ingest_documents(file_path)
-                st.session_state["vectorstore"] = vectorstore
-                st.session_state["chain"] = create_rag_chain(vectorstore)
-
-            st.success(f"✅ **{uploaded_file.name}** processed successfully!")
-            st.button("💬 Start Chatting →", on_click=go_to_chat, type="primary", use_container_width=True)
-
-        elif "chain" in st.session_state:
-            st.info("📚 You have a previously loaded document ready.")
-            st.button("💬 Continue Chatting →", on_click=go_to_chat, type="primary", use_container_width=True)
 
 
 # ============================================================
