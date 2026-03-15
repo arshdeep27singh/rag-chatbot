@@ -269,7 +269,7 @@ if st.session_state["page"] == "home":
             <p>Every answer includes page references so you can verify</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">�</div>
+            <div class="feature-icon">&#x1F512;</div>
             <h3>Private Sessions</h3>
             <p>Each session is isolated — your documents are never shared with others</p>
         </div>
